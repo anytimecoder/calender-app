@@ -83,35 +83,48 @@ class UserEventSyncService
             'changed_at' => $eventData->changed,
         ]);
 
-        // TODO probably not performant - too many updates will happen, and not nice code overall. Should probably connect with cache to avoid extra writing
         /** @var string $email */
         foreach ($eventData->accepted as $email) {
             if (str_contains($email, '@usergems')) { // FIXME hack
                 continue;
             }
-            /** @var  $personDTO */
-            $personDTO = $this->personApi->getPerson($email);
-
-            $companyDTO = $personDTO->company;
-
-            $company = Company::updateOrCreate([
-                'name' => $companyDTO->name,
-            ], [
-                'linkedin_url' => $companyDTO->linkedin_url,
-                'employees' => $companyDTO->employees,
-            ]);
-
-            $event->persons()->updateOrCreate([
-                'email' => $email
-            ], [
-                'first_name' => $personDTO->first_name,
-                'last_name' => $personDTO->last_name,
-                'avatar' => $personDTO->avatar,
-                'title' => $personDTO->title,
-                'linkedin_url' => $personDTO->linkedin_url,
-                'company_id' => $company->id,
-            ]);
+            $this->syncPerson($email, $event);
         }
 
+        foreach ($eventData->rejected as $email) {
+            if (str_contains($email, '@usergems')) { // FIXME hack
+                continue;
+            }
+            $this->syncPerson($email, $event, false);
+        }
+    }
+
+    // TODO probably not performant - too many updates will happen, and not nice code overall. Should probably connect with cache to avoid extra writing
+    private function syncPerson(string $email, Event $event, bool $attends = true)
+    {
+        /** @var  $personDTO */
+        $personDTO = $this->personApi->getPerson($email);
+
+        $companyDTO = $personDTO->company;
+
+        $company = Company::updateOrCreate([
+            'name' => $companyDTO->name,
+        ], [
+            'linkedin_url' => $companyDTO->linkedin_url,
+            'employees' => $companyDTO->employees,
+        ]);
+
+        $person = $event->persons()->updateOrCreate([
+            'email' => $email,
+        ], [
+            'first_name' => $personDTO->first_name,
+            'last_name' => $personDTO->last_name,
+            'avatar' => $personDTO->avatar,
+            'title' => $personDTO->title,
+            'linkedin_url' => $personDTO->linkedin_url,
+            'company_id' => $company->id,
+        ]);
+
+        $event->persons()->updateExistingPivot($person, ['is_attending' => $attends]);
     }
 }

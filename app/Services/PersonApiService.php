@@ -22,20 +22,16 @@ class PersonApiService implements PersonApiInterface
 
     public function getPerson(string $email): PersonDTO
     {
-        Cache::clear();
         $data = Cache::get(self::PERSON_CACHE_KEY . $email, function () use ($email) {
             $person = $this->fetchPersonFromAPI($email);
             Cache::put(self::PERSON_CACHE_KEY . $email, $person, self::TTL);
             return $person;
         });
-
-        var_dump($data);
         return PersonDTO::from($data);
     }
 
     public function fetchPersonFromAPI(string $email): array
     {
-        echo('URL: ' . $this->apiUrl . '/' . $email . PHP_EOL);
         return Http::withToken($this->apiKey)
             ->get($this->apiUrl . '/' . $email)
             ->json();
