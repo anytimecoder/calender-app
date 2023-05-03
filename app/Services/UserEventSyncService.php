@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Data\EventDTO;
 use App\Data\PaginatedEventDTO;
+use App\Interfaces\CalendarApiInterface;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
@@ -12,7 +13,7 @@ class UserEventSyncService
 {
 
     public function __construct(
-        private CalendarApiService $calendarApiService
+        private CalendarApiInterface $calendarApiService
     ) {
     }
 

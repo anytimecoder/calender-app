@@ -31,4 +31,7 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'calendar_api' => [
+        'url' => env('CALENDAR_API_URL'),
+    ],
 ];
