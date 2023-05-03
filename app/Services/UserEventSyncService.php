@@ -31,7 +31,7 @@ class UserEventSyncService
     private function checkAndUpdateEvents(User $user, int $page = 1): void
     {
         $synced = false;
-        $paginatedEvents = $this->calendarApiService->getEvents($user->calendar_api_token);
+        $paginatedEvents = $this->calendarApiService->getEvents($user->calendar_api_token, $page);
         /** @var PaginatedEventDTO $events */
         $events = $paginatedEvents->data;
         foreach ($events as $event) {
@@ -43,8 +43,11 @@ class UserEventSyncService
             }
         }
 
+        if ($synced) {
+            return;
+        }
         $moreResults = $paginatedEvents->current_page * $paginatedEvents->per_page < $paginatedEvents->total;
-        if (!$synced && $moreResults) {
+        if ($moreResults) {
             // iterate recursively
             $this->checkAndUpdateEvents($user, $page + 1);
         }
