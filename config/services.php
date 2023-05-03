@@ -34,4 +34,9 @@ return [
     'calendar_api' => [
         'url' => env('CALENDAR_API_URL'),
     ],
+
+    'person_api' => [
+        'url' => env('PERSON_API_URL'),
+        'token' => env('PERSON_API_TOKEN'),
+    ],
 ];
