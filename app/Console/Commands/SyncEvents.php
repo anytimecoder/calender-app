@@ -31,7 +31,6 @@ class SyncEvents extends Command
         UserRepository $userRepository,
         UserEventSyncService $userEventSyncService,
         EmailWriterService $emailWriterService,
-        Email $email,
     ): void {
         $dateString = $this->argument('date');
         $date = $dateString ? new \DateTimeImmutable($dateString) : new \DateTimeImmutable('now');
@@ -39,7 +38,8 @@ class SyncEvents extends Command
             $userEventSyncService->sync($user);
             $json = $emailWriterService->makeEmail($user, $date);
             Email::firstOrCreate([
-                'scheduled_for' => $date->format('Y-m-d'), 'user_id' => $user->id
+                'scheduled_for' => $date->format('Y-m-d'),
+                'user_id' => $user->id
             ], [
                 'data' => json_encode($json) // json_encode is only needed because of sqlite
             ]);
