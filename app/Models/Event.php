@@ -5,11 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 
 /**
  * @property mixed $start_at
  * @property mixed $end_at
  * @property string $title
+ * @property Collection<Person> $persons
+ * @property Collection<User> $users
  */
 class Event extends Model
 {
@@ -23,6 +26,8 @@ class Event extends Model
         'changed_at'
     ];
 
+    protected $hidden = ['pivot'];
+
     protected $casts = [
         'start_at' => 'datetime',
         'end_at' => 'datetime'
@@ -35,6 +40,6 @@ class Event extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(Person::class, 'user_events');
+        return $this->belongsToMany(User::class, 'user_events');
     }
 }

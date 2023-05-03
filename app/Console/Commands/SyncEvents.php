@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Email;
 use App\Repositories\UserRepository;
+use App\Services\EmailWriterService;
 use App\Services\UserEventSyncService;
 use Illuminate\Console\Command;
 
@@ -13,7 +15,7 @@ class SyncEvents extends Command
      *
      * @var string
      */
-    protected $signature = 'app:sync-events';
+    protected $signature = 'app:sync-events {date?}';
 
     /**
      * The console command description.
@@ -25,10 +27,22 @@ class SyncEvents extends Command
     /**
      * Execute the console command.
      */
-    public function handle(UserRepository $userRepository, UserEventSyncService $userEventSyncService): void
-    {
+    public function handle(
+        UserRepository $userRepository,
+        UserEventSyncService $userEventSyncService,
+        EmailWriterService $emailWriterService,
+        Email $email,
+    ): void {
+        $dateString = $this->argument('date');
+        $date = $dateString ? new \DateTimeImmutable($dateString) : new \DateTimeImmutable('now');
         foreach ($userRepository->findAll() as $user) {
             $userEventSyncService->sync($user);
+            $json = $emailWriterService->makeEmail($user, $date);
+            Email::firstOrCreate([
+                'scheduled_for' => $date->format('Y-m-d'), 'user_id' => $user->id
+            ], [
+                'data' => json_encode($json) // json_encode is only needed because of sqlite
+            ]);
         }
     }
 }
