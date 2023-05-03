@@ -11,11 +11,13 @@ class Person extends Model
 {
     use HasFactory;
 
+    protected $table = 'persons';
+
     protected $fillable = [
         'email',
         'first_name',
         'last_name',
-        'avatar',
+        'avatar_url',
         'title',
         'linkedin_url',
         'company_id',

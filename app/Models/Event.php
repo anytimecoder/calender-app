@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property mixed $start_at
+ * @property mixed $end_at
+ * @property string $title
+ */
 class Event extends Model
 {
     use HasFactory;
@@ -28,7 +33,7 @@ class Event extends Model
         return $this->belongsToMany(Person::class, 'person_events')->withPivot('is_attending');
     }
 
-    public function user(): BelongsToMany
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(Person::class, 'user_events');
     }

@@ -8,7 +8,7 @@ return new class extends Migration
 {
 
     private const TABLE_NAME = 'persons';
-    private const COMPANY_TABLE_NAME = 'company';
+    private const COMPANY_TABLE_NAME = 'companies';
 
     /**
      * Run the migrations.

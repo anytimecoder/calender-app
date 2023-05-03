@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    const TABLE_NAME = 'companies';
+    private const TABLE_NAME = 'companies';
 
     /**
      * Run the migrations.
